@@ -2,7 +2,6 @@ package android.example.securedsmessenger;
 
 import android.util.Log;
 
-import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -11,7 +10,7 @@ import java.net.URISyntaxException;
 
 public class Server {
 
-    WebSocket client;
+    WebSocketClient mClient;
 
     public void connect() {
         URI address;
@@ -23,11 +22,20 @@ public class Server {
 
         }
 
-        client = new WebSocketClient(address) {
+        mClient = new WebSocketClient(address) {
             @Override
             public void onOpen(ServerHandshake handshakedata) {
                 //При подлючении
                 Log.i("SERVER", "Connection to server is open");
+
+                String myName = Protocol.packNAme(new Protocol.UserName("Dark Side"));
+                Log.i("SERVER", "Sending my name to server");
+//                String myName = "3{ name: \"Мишаня\" }";
+                mClient.send(myName);
+
+                //1 - статус пользоваетеля
+                //2 - текст сообщения
+                //3 - имя пользователя
             }
 
             @Override
@@ -45,11 +53,12 @@ public class Server {
             @Override
             public void onError(Exception ex) {
                 //При ошибке
-                Log.i("SERVER", "Error occurred");
+                Log.i("SERVER", "Error occurred" + ex.getMessage());
             }
         };
-        connect();
+        mClient.connect();
 
 
     }
+
 }
