@@ -17,13 +17,13 @@ public class Server {
 
     WebSocketClient mClient;
     private Consumer<Pair<String, String>> onMessageReceived;
-    Map<Long, String> names = new ConcurrentHashMap<>();
-    private MainActivity activity;
+    Map<Long, String> mNames = new ConcurrentHashMap<>();
+    private MainActivity mActivity;
 
 
     public Server(Consumer<Pair<String, String>> onMessageReceived, MainActivity activity) {
         this.onMessageReceived = onMessageReceived;
-        this.activity = activity;
+        mActivity = activity;
     }
 
     public void connect() {
@@ -52,8 +52,6 @@ public class Server {
                 String packedMessage = Protocol.packMessage(m);
                 Log.i("SERVER", "Sending message" + packedMessage);
 
-                MainActivity.count++;
-
                 //1 - статус пользоваетеля
                 //2 - текст сообщения
                 //3 - имя пользователя
@@ -67,7 +65,7 @@ public class Server {
                 if (type == Protocol.USER_STATUS){
                     //обработать факт подключения или отключения пользователя
                     userStatusChanged(message);
-                    activity.increaseUsers();
+                    mActivity.increaseUsers();
                 }
                 if (type == Protocol.MESSAGE){
                     //Показать сообющение
@@ -92,7 +90,7 @@ public class Server {
 
     private void displayIncomingMessage(String json){
         Protocol.Message m = Protocol.unpackMessage(json);
-        String name = names.get(m.getSender());
+        String name = mNames.get(m.getSender());
         if (name == null){
             name = "Аноним";
         }
@@ -104,11 +102,10 @@ public class Server {
     private void userStatusChanged(String json){
         Protocol.UserStatus status = Protocol.unpackStatus(json);
         if (status.isConnected()){
-            names.put(status.getUser().getId(), status.getUser().getName());
-            activity.showToast(status.getUser().getName() + " пдключился к чату" );
-            MainActivity.count++;
+            mNames.put(status.getUser().getId(), status.getUser().getName());
+            mActivity.showToast(status.getUser().getName() + " пдключился к чату" );
         } else {
-            names.remove(status.getUser().getId());
+            mNames.remove(status.getUser().getId());
         }
     }
 

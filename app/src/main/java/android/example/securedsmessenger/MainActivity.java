@@ -15,14 +15,13 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button sendButton;
-    EditText userInput;
-    RecyclerView chatWindow;
-    MessageController controller;
-    Server server;
-    TextView counter;
-    public static int count;
-
+    Button mSendButton;
+    EditText mUserInput;
+    RecyclerView mChatWindow;
+    MessageController mController;
+    Server mServer;
+    TextView mCounter;
+    public static int mCount;
 
 
     @Override
@@ -30,53 +29,53 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        sendButton = findViewById(R.id.send_btn);
-        userInput = findViewById(R.id.message_text);
-        chatWindow = findViewById(R.id.chat_window);
-        counter = findViewById(R.id.counter_text);
+        mSendButton = findViewById(R.id.send_btn);
+        mUserInput = findViewById(R.id.message_text);
+        mChatWindow = findViewById(R.id.chat_window);
+        mCounter = findViewById(R.id.counter_text);
 
-        controller = new MessageController();
-        controller.setIncomingLayout(R.layout.message);
-        controller.setOutgoingLayout(R.layout.outgoing_message);
-        controller.setMessageTextId(R.id.message_text);
-        controller.setUserNameId(R.id.user_name);
-        controller.setMessageTimeId(R.id.message_date);
-        controller.appendTo(chatWindow, this);
+        mController = new MessageController();
+        mController.setIncomingLayout(R.layout.message);
+        mController.setOutgoingLayout(R.layout.outgoing_message);
+        mController.setMessageTextId(R.id.message_text);
+        mController.setUserNameId(R.id.user_name);
+        mController.setMessageTimeId(R.id.message_date);
+        mController.appendTo(mChatWindow, this);
 
-        controller.addMessage(
+        mController.addMessage(
                 new MessageController.Message("I am writing a secure messenger for our super secret conversations", "Dark Side", true));
 
-        sendButton.setOnClickListener(new View.OnClickListener() {
+        mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String text = userInput.getText().toString();
-                controller.addMessage(
+                String text = mUserInput.getText().toString();
+                mController.addMessage(
                         new MessageController.Message(text, "Рептилоид", false)
                 );
-                server.sendMessage(text);
-                userInput.setText("");
+                mServer.sendMessage(text);
+                mUserInput.setText("");
             }
         });
 
-        server = new Server(new Consumer<Pair<String, String>>() {
+        mServer = new Server(new Consumer<Pair<String, String>>() {
             @Override
             public void accept(final Pair<String, String> pair) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        controller.addMessage(
+                        mController.addMessage(
                                 new MessageController.Message(pair.second, pair.first, false)
                         );
                     }
                 });
 
             }
-        },this);
-        server.connect();
+        }, this);
+        mServer.connect();
 
     }
 
-    public void showToast(final String text){
+    public void showToast(final String text) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -86,13 +85,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-    public void increaseUsers (){
+    public void increaseUsers() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                count++;
-                counter.setText("Пользователей онлайн: " + count);
+                mCount++;
+                mCounter.setText("Пользователей онлайн: " + mCount);
             }
         });
 
