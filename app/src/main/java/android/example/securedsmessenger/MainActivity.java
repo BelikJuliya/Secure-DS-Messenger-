@@ -1,12 +1,17 @@
 package android.example.securedsmessenger;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.util.Consumer;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -15,6 +20,10 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView chatWindow;
     MessageController controller;
     Server server;
+    TextView counter;
+    public static int count;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         sendButton = findViewById(R.id.send_btn);
         userInput = findViewById(R.id.message_text);
         chatWindow = findViewById(R.id.chat_window);
+        counter = findViewById(R.id.counter_text);
 
         controller = new MessageController();
         controller.setIncomingLayout(R.layout.message);
@@ -34,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         controller.appendTo(chatWindow, this);
 
         controller.addMessage(
-                new MessageController.Message("Hello, Denis! I am writing a secure messenger for our super secret conversations", "Dark Side", true));
+                new MessageController.Message("I am writing a secure messenger for our super secret conversations", "Dark Side", true));
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,11 +53,50 @@ public class MainActivity extends AppCompatActivity {
                 controller.addMessage(
                         new MessageController.Message(text, "Рептилоид", false)
                 );
+                server.sendMessage(text);
                 userInput.setText("");
             }
         });
 
-        server = new Server();
+        server = new Server(new Consumer<Pair<String, String>>() {
+            @Override
+            public void accept(final Pair<String, String> pair) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        controller.addMessage(
+                                new MessageController.Message(pair.second, pair.first, false)
+                        );
+                    }
+                });
+
+            }
+        },this);
         server.connect();
+
     }
+
+    public void showToast(final String text){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+
+    public void increaseUsers (){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                count++;
+                counter.setText("Пользователей онлайн: " + count);
+            }
+        });
+
+    }
+
+
 }
