@@ -66,12 +66,11 @@ public class Server {
                 int type = Protocol.getType(message);
                 if (type == Protocol.USER_STATUS){
                     //обработать факт подключения или отключения пользователя
-
                     userStatusChanged(message);
                     activity.increaseUsers();
                 }
                 if (type == Protocol.MESSAGE){
-                    //Показать сообющение на 'rhfyt
+                    //Показать сообющение
                     displayIncomingMessage(message);
                 }
             }
